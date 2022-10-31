@@ -10,6 +10,7 @@ class Vehicle
     "#{make} #{model}"
   end
 end
+
 class Car < Vehicle
   def wheels
     4
