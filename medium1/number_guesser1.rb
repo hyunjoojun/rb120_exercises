@@ -1,9 +1,11 @@
 class GuessingGame
   attr_accessor :number_of_guesses
+  MAX_GUESSES = 7
+  RANGE = 1..100
 
   def initialize
-    @winning_number = (1..100).to_a.sample
-    @number_of_guesses = 7
+    @winning_number = RANGE.to_a.sample
+    @number_of_guesses = MAX_GUESSES
   end
 
   def display_number_of_guesses
@@ -15,7 +17,7 @@ class GuessingGame
     loop do
       puts 'Enter a number between 1 and 100:'
       guessed_num = gets.chomp.to_i
-      break if (1..100).to_a.include?(guessed_num)
+      break if RANGE.to_a.include?(guessed_num)
 
       puts 'Invalid guess.'
     end
