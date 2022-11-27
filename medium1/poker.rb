@@ -83,8 +83,10 @@ class PokerHand
   end
 
   def straight?
+    return false if @cards.map { |c| c.rank }.uniq.count < 5
+
     sorted_cards = @cards.sort_by { |rank, _| rank.value }
-    sorted_cards.first.value == sorted_cards.last.value - 4
+    sorted_cards.first.value == (sorted_cards.last.value - 4)
   end
 
   def straight_flush?
@@ -114,9 +116,9 @@ class PokerHand
   end
 
   def two_pair?
-    # ranks = @cards.map(&:rank)
-    # pairs = ranks.select { |value| ranks.count(value) == 2 }
-    # pairs.size == 4
+    ranks = @cards.map(&:rank)
+    pairs = ranks.select { |value| ranks.count(value) == 2 }
+    pairs.size == 4
   end
 
   def pair?
