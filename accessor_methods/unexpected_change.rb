@@ -1,10 +1,12 @@
 class Person
   def name=(name)
-    @first_name, @last_name = name.split(' ')
+    parts = name.split
+    @first_name = parts.first
+    @last_name = parts.last
   end
 
   def name
-    "#{@first_name} #{@last_name}"
+    "#{@first_name} #{@last_name}".strip
   end
 end
 
