@@ -9,29 +9,26 @@ class Vehicle
   def to_s
     "#{make} #{model}"
   end
+
+  def wheels
+    self.class::NUMBER_OF_WHEELS
+  end
 end
 
 class Car < Vehicle
-  def wheels
-    4
-  end
+  NUMBER_OF_WHEELS = 4
 end
 
 class Motorcycle < Vehicle
-  def wheels
-    2
-  end
+  NUMBER_OF_WHEELS = 2
 end
 
-class Truck
+class Truck < Vehicle
+  NUMBER_OF_WHEELS = 6
   attr_reader :payload
 
   def initialize(make, model, payload)
     super(make, model)
     @payload = payload
-  end
-
-  def wheels
-    6
   end
 end
