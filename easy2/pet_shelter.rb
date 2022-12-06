@@ -33,13 +33,20 @@ class Owner
 end
 
 class Shelter
+  attr_reader :unadopted_pets
+
   def initialize
     @owners = {}
+    @unadopted_pets = []
   end
 
   def adopt(owner, pet)
     owner.add_pet(pet)
     @owners[owner.name] ||= owner
+  end
+
+  def accept_pet(pet)
+    @unadopted_pets << pet
   end
 
   def print_adoptions
@@ -48,6 +55,14 @@ class Shelter
       owner.print_pets
       puts
     end
+  end
+
+  def number_of_unadopted_pets
+    @unadopted_pets.size
+  end
+
+  def print_available
+    puts "The animal shelter has #{number_of_unadopted_pets} unadopted pets."
   end
 end
 
@@ -70,6 +85,20 @@ shelter.adopt(bholmes, kennedy)
 shelter.adopt(bholmes, sweetie)
 shelter.adopt(bholmes, molly)
 shelter.adopt(bholmes, chester)
+shelter.accept_pet(Pet.new('dog', 'Jetty'))
+shelter.accept_pet(Pet.new('dog', 'Cloudy'))
+shelter.accept_pet(Pet.new('cat', 'Fluffy'))
+shelter.accept_pet(Pet.new('cat', 'Kat'))
+shelter.accept_pet(Pet.new('cat', 'Ben'))
+shelter.accept_pet(Pet.new('parakeet', 'Chatterbox'))
+shelter.accept_pet(Pet.new('parakeet', 'Bluebell'))
+
 shelter.print_adoptions
+shelter.print_available
+
 puts "#{phanson.name} has #{phanson.number_of_pets} adopted pets."
 puts "#{bholmes.name} has #{bholmes.number_of_pets} adopted pets."
+
+puts ' '
+puts 'Unadopted pets :'
+puts shelter.unadopted_pets
