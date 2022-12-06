@@ -1,12 +1,11 @@
 module Walkable
-  def walk
-    "#{name} #{gait} forward."
+  def walk(title='')
+    "#{title} #{name} #{gait} forward".lstrip
   end
 end
 
 class Person
   attr_reader :name
-
   include Walkable
 
   def initialize(name)
@@ -20,9 +19,26 @@ class Person
   end
 end
 
+class Noble < Person
+  include Walkable
+  attr_reader :title
+
+  def initialize(name, title)
+    super(name)
+    @title = title
+  end
+
+  def walk
+    super(title)
+  end
+
+  def gait
+    "struts"
+  end
+end
+
 class Cat
   attr_reader :name
-
   include Walkable
 
   def initialize(name)
@@ -38,7 +54,6 @@ end
 
 class Cheetah
   attr_reader :name
-
   include Walkable
 
   def initialize(name)
@@ -52,6 +67,10 @@ class Cheetah
   end
 end
 
+byron = Noble.new("Byron", "Lord")
+puts byron.walk
+# => "Lord Byron struts forward"
+
 mike = Person.new("Mike")
 puts mike.walk
 # => "Mike strolls forward"
@@ -63,24 +82,3 @@ puts kitty.walk
 flash = Cheetah.new("Flash")
 puts flash.walk
 # => "Flash runs forward"
-
-class Noble < Person
-  attr_reader :title
-
-  def initialize(name, title)
-    super(name)
-    @title = title
-  end
-
-  def gait
-    "struts"
-  end
-
-  def walk
-    "#{title} " + super
-  end
-end
-
-byron = Noble.new("Byron", "Lord")
-puts byron.walk
-# => "Lord Byron struts forward"
