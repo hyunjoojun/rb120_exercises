@@ -1,30 +1,24 @@
 class CircularQueue
-  def initialize(size)
-    @buffer = [nil] * size
-    @next_position = 0
-    @oldest_position = 0
+  def initialize(max_size)
+    @queue = []
+    @max_size = max_size
   end
 
-  def enqueue(object)
-    unless @buffer[@next_position].nil?
-      @oldest_position = increment(@next_position)
-    end
-
-    @buffer[@next_position] = object
-    @next_position = increment(@next_position)
+  def enqueue(obj)
+    dequeue if full?
+    queue << obj
   end
 
   def dequeue
-    value = @buffer[@oldest_position]
-    @buffer[@oldest_position] = nil
-    @oldest_position = increment(@oldest_position) unless value.nil?
-    value
+    queue.shift
   end
 
   private
 
-  def increment(position)
-    (position + 1) % @buffer.size
+  attr_reader :queue, :max_size
+
+  def full?
+    queue.size == max_size
   end
 end
 
@@ -42,6 +36,7 @@ puts queue.dequeue == 2
 queue.enqueue(5)
 queue.enqueue(6)
 queue.enqueue(7)
+
 puts queue.dequeue == 5
 puts queue.dequeue == 6
 puts queue.dequeue == 7
