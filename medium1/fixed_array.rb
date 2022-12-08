@@ -1,23 +1,33 @@
 class FixedArray
-  def initialize(length)
-    @arr = Array.new(length)
+  attr_reader :size, :array
+
+  def initialize(size)
+    @size = size
+    @array = Array.new(size)
   end
 
-  def [](index)
-    @arr.fetch(index)
+  def [](idx)
+    valid_index?(idx)
+    array.fetch(idx)
   end
 
-  def []=(index, value)
-    self[index]
-    @arr[index] = value
+  def []=(idx, value)
+    valid_index?(idx)
+    array[idx] = value
   end
 
   def to_a
-    @arr.clone
+    array.clone
   end
 
   def to_s
-    to_a.to_s
+    array.to_s
+  end
+
+  private
+
+  def valid_index?(idx)
+    raise IndexError if idx >= size
   end
 end
 
