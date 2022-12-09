@@ -1,61 +1,85 @@
 class GuessingGame
-  attr_accessor :number_of_guesses, :guessed_num
-
-  def initialize(min, max)
-    @range = min..max
-    @winning_number = @range.to_a.sample
+  def initialize(min_num, max_num)
+    @range = (min_num..max_num).to_a
     @number_of_guesses = calculate_max_number
   end
 
+  def play
+    reset
+    loop do
+      display_number_of_guesses
+      guess_number
+      evaluate_number
+      break if game_over? || won?
+    end
+    puts you_lost if game_over? && !won?
+  end
+
+  private
+
+  attr_reader :number_of_guesses, :guessed_num, :winning_num, :range
+
   def calculate_max_number
-    size_of_range = @range.to_a.size
+    size_of_range = @range.size
     Math.log2(size_of_range).to_i + 1
   end
 
-  def display_number_of_guesses
-    puts "You have #{@number_of_guesses} guesses remaining."
-  end
-
-  def ask_user_to_guess
-    loop do
-      puts "Enter a number between #{@range.first} and #{@range.last}:"
-      @guessed_num = gets.chomp.to_i
-      break if @range.to_a.include?(@guessed_num)
-
-      puts 'Invalid guess.'
-    end
-    @guessed_num
-  end
-
-  def give_hint
-    if @guessed_num > @winning_number
-      puts 'Your guess is too high.'
-    elsif @winning_number > @guessed_num
-      puts 'Your guess is too low.'
-    else
-      you_won
-    end
+  def reset
+    @winning_num = @range.sample
+    @number_of_guesses = calculate_max_number
   end
 
   def you_won
-    puts "That's the number! You won!"
+    "That's the number! You won!"
   end
 
   def you_lost
-    puts 'You have no more guesses. You lost!'
+    'You have no more guesses. You lost!'
   end
 
-  def play
-    loop do
-      display_number_of_guesses
-      @guessed_num = ask_user_to_guess
-      give_hint
-      @number_of_guesses -= 1
-      break if @number_of_guesses.zero? || @guessed_num == @winning_number
+  def game_over?
+    number_of_guesses.zero?
+  end
+
+  def won?
+    guessed_num == winning_num
+  end
+
+  def display_number_of_guesses
+    if number_of_guesses == 1
+      puts 'You have only 1 guess remaining!!'
+    else
+      puts "You have #{number_of_guesses} guesses remaining."
     end
-    you_lost if @guessed_num != @winning_number
+  end
+
+  def guess_number
+    loop do
+      puts "Enter a number between #{range.first} and #{range.last}:"
+      num = gets.chomp.to_i
+      if @range.include?(num)
+        @guessed_num = num
+        @number_of_guesses -= 1
+        break
+      end
+      puts 'Invalid guess.'
+    end
+  end
+
+  def evaluate_number
+    if guessed_num > winning_num
+      puts 'Your guess is too high'
+    elsif guessed_num < winning_num
+      puts 'Your guess is too low'
+    else
+      puts you_won
+    end
   end
 end
 
 game = GuessingGame.new(501, 1500)
 game.play
+game.play
+
+game2 = GuessingGame.new(50, 2000)
+game2.play
