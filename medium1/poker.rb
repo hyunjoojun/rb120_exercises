@@ -1,29 +1,5 @@
 require 'pry'
 
-class Card
-  include Comparable
-  attr_reader :rank, :suit
-
-  VALUES = { 'Jack' => 11, 'Queen' => 12, 'King' => 13, 'Ace' => 14 }
-
-  def initialize(rank, suit)
-    @rank = rank
-    @suit = suit
-  end
-
-  def to_s
-    "#{rank} of #{suit}"
-  end
-
-  def value
-    VALUES.fetch(rank, rank)
-  end
-
-  def <=>(other_card)
-    value <=> other_card.value
-  end
-end
-
 class Deck
   RANKS = ((2..10).to_a + %w(Jack Queen King Ace)).freeze
   SUITS = %w(Hearts Clubs Diamonds Spades).freeze
@@ -48,17 +24,49 @@ class Deck
   end
 end
 
+class Card
+  include Comparable
+  attr_reader :rank, :suit
+
+  RANK_VALUES = { 'Jack' => 11, 'Queen' => 12, 'King' => 13, 'Ace' => 14 }
+  SUIT_VALUES = { "Diamonds" => 1, "Clubs" => 2, "Hearts" => 3, "Spades" => 4 }
+
+  def initialize(rank, suit)
+    @rank = rank
+    @suit = suit
+  end
+
+  def to_s
+    "#{rank} of #{suit}"
+  end
+
+  def rank_value
+    RANK_VALUES.fetch(rank, rank)
+  end
+
+  def suit_value
+    SUIT_VALUES[suit]
+  end
+
+  def <=>(other)
+    if rank_value == other.rank_value
+      suit_value <=> other.suit_value
+    else
+      rank_value <=> other.rank_value
+    end
+  end
+end
+
 class PokerHand
+  attr_reader :cards
+
   def initialize(deck)
     @cards = []
-
-    5.times do
-      @cards << deck.draw
-    end
+    5.times { @cards << deck.draw }
   end
 
   def print
-    puts @cards
+    puts cards
   end
 
   def evaluate
@@ -78,29 +86,35 @@ class PokerHand
 
   private
 
-  def flush?
-    @cards.all? { |card| card.suit == @cards[0].suit }
+  def collect_ranks(cards)
+    cards.map do |card|
+      card.rank.to_s
+    end
   end
 
-  def straight?
-    return false if @cards.map { |c| c.rank }.uniq.count < 5
+  def count_hash(ranks)
+    count = {}
+    ranks.each do |rank|
+      next if count.key?(rank)
 
-    sorted_cards = @cards.sort_by { |rank, _| rank.value }
-    sorted_cards.first.value == (sorted_cards.last.value - 4)
+      count[rank] = ranks.count(rank)
+    end
+    count
+  end
+
+  def royal_flush?
+    sorted_ranks = collect_ranks(cards.sort)
+    sorted_ranks.first == '10' && sorted_ranks.last == 'Ace' && straight_flush?
   end
 
   def straight_flush?
     straight? && flush?
   end
 
-  def royal_flush?
-    sorted_cards = @cards.sort_by { |rank, _| rank.value }
-    sorted_cards.first.value == 10 && straight_flush?
-  end
-
   def n_of_a_kind?(n)
-    ranks = @cards.map(&:rank)
-    ranks.any? { |value| ranks.count(value) == n }
+    ranks = collect_ranks(cards)
+    counts = count_hash(ranks)
+    counts.values.include?(n)
   end
 
   def four_of_a_kind?
@@ -108,7 +122,18 @@ class PokerHand
   end
 
   def full_house?
-    n_of_a_kind?(3) && n_of_a_kind?(2)
+    pair? && three_of_a_kind?
+  end
+
+  def flush?
+    suits = cards.map(&:suit)
+    suits.uniq.size == 1
+  end
+
+  def straight?
+    sorted_cards = cards.sort
+    uniq_rank_cards = collect_ranks(cards).uniq
+    sorted_cards.last.rank_value - sorted_cards.first.rank_value == 4 && uniq_rank_cards.size == 5
   end
 
   def three_of_a_kind?
@@ -116,9 +141,9 @@ class PokerHand
   end
 
   def two_pair?
-    ranks = @cards.map(&:rank)
-    pairs = ranks.select { |value| ranks.count(value) == 2 }
-    pairs.size == 4
+    ranks = collect_ranks(cards)
+    counts = count_hash(ranks)
+    counts.values.count(2) == 2
   end
 
   def pair?
@@ -137,6 +162,7 @@ class Array
 end
 
 # Test that we can identify each PokerHand type.
+
 hand = PokerHand.new([
   Card.new(10,      'Hearts'),
   Card.new('Ace',   'Hearts'),
