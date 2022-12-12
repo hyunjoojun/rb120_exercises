@@ -12,12 +12,12 @@ class GuessingGame
       evaluate_number
       break if game_over? || won?
     end
-    puts you_lost if game_over? && !won?
+    puts lose_message if game_over? && !won?
   end
 
   private
 
-  attr_reader :number_of_guesses, :guessed_num, :winning_num, :range
+  attr_reader :number_of_guesses, :current_guess, :winning_num, :range
 
   def calculate_max_number
     size_of_range = @range.size
@@ -27,13 +27,14 @@ class GuessingGame
   def reset
     @winning_num = @range.sample
     @number_of_guesses = calculate_max_number
+    @current_guess = nil
   end
 
-  def you_won
+  def win_message
     "That's the number! You won!"
   end
 
-  def you_lost
+  def lose_message
     'You have no more guesses. You lost!'
   end
 
@@ -42,7 +43,7 @@ class GuessingGame
   end
 
   def won?
-    guessed_num == winning_num
+    current_guess == winning_num
   end
 
   def display_number_of_guesses
@@ -58,7 +59,7 @@ class GuessingGame
       puts "Enter a number between #{range.first} and #{range.last}:"
       num = gets.chomp.to_i
       if @range.include?(num)
-        @guessed_num = num
+        @current_guess = num
         @number_of_guesses -= 1
         break
       end
@@ -67,12 +68,12 @@ class GuessingGame
   end
 
   def evaluate_number
-    if guessed_num > winning_num
+    if current_guess > winning_num
       puts 'Your guess is too high'
-    elsif guessed_num < winning_num
+    elsif current_guess < winning_num
       puts 'Your guess is too low'
     else
-      puts you_won
+      puts win_message
     end
   end
 end
