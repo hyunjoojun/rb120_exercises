@@ -5,11 +5,11 @@ class FixedArray
   end
 
   def to_a
-    @array
+    @array.clone
   end
 
   def to_s
-    @array.to_s
+    to_a.to_s
   end
 
   def [](num)
@@ -27,7 +27,7 @@ class FixedArray
   private
 
   def valid_index?(index)
-    index <= @array.size
+    index < @array.size
   end
 end
 
